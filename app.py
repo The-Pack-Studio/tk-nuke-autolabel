@@ -110,7 +110,7 @@ class NukeAutolabel(tank.platform.Application):
                 if fields.get("Camera"): Camera = str(fields.get("Camera"))
                 if fields.get("AOV"): AOV = str(fields.get("AOV"))
 
-                if Camera == 'beauty' or AOV == 'beauty': 
+                if Camera == 'beauty' or AOV == 'beauty' or Camera == 'RGBA' or AOV == 'RGBA': 
                     readNode.knob('tile_color').setValue(self.beauty_tile_color)
                 else :
                     readNode.knob('tile_color').setValue(self.other3d_tile_color)
