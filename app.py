@@ -87,8 +87,10 @@ class NukeAutolabel(tank.platform.Application):
         currentFrame = readNode.knob('file').evaluate()
         currentFrame = os.path.basename(currentFrame)
         userlabel = readNode.knob('label').value()
-        colorspace = readNode.knob("colorspace").value()
-        colorspace = '(' + colorspace + ')'
+        colorspace = ""
+        if not "DeepRead" in readNode.Class(): # DeepRead nodes have no colorspace knob
+            colorspace = readNode.knob("colorspace").value()
+            colorspace = '(' + colorspace + ')'
 
 
         labelStart = name + '\n' + currentFrame
