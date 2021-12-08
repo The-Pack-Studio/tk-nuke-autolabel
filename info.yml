@@ -18,17 +18,19 @@ configuration:
         description : Reference to the name of the templates of 3d renders
         values :
             type : str
-            default_value : 'maya_render_output'
+        default_value : [shot_render_output]
     beauty_tile_color:
         type: list     
         values:
             type: int
+        default_value: [0, 255, 0]
         description:    "Specify a list of 3 values in the range 0-255 that represent the RGB values to be
                          set for the read node tile_color of beauty passes"
     other3d_tile_color:
         type: list     
         values:
             type: int
+        default_value: [0, 255, 0]
         description:    "Specify a list of 3 values in the range 0-255 that represent the RGB values to be
                          set for the read node tile_color of non-beauty passes"
 # the Shotgun fields that this app needs in order to operate correctly
