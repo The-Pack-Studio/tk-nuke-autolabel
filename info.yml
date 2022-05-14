@@ -33,12 +33,35 @@ configuration:
         default_value: [0, 255, 0]
         description:    "Specify a list of 3 values in the range 0-255 that represent the RGB values to be
                          set for the read node tile_color of non-beauty passes"
+    hiero_templates:
+        type: list
+        allows_empty: False
+        description : Reference to the name of the templates of hiero renders
+        values :
+            type : str
+    hiero_default_color:
+        type: list
+        description : Default node color for hiero renders nodes
+        values :
+            type : int
+    hiero_type_field:
+        type: str
+        description: "Field from the hiero template that will be used to separate between types of hiero renders"
+    hiero_type_colors:
+        type: dict
+        allows_empty: False
+        description: "Dict with keys = hiero type, values = color"
+
+
+
+
+
 # the Shotgun fields that this app needs in order to operate correctly
 requires_shotgun_fields:
 
 # More verbose description of this item 
-display_name: "Autolabel for 3d renders"
-description: "Autolabel for 3d renders"
+display_name: "Nuke nodes autolabel"
+description: "App setting the Nuke read nodes label and color automatically"
 
 # Required minimum versions for this item to run
 requires_shotgun_version:

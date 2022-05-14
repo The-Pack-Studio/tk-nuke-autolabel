@@ -82,6 +82,10 @@ class NukeAutolabel(tank.platform.Application):
 
     def setReadLabel(self):
 
+
+        tk = self.sgtk
+        context = self.context
+
         readNode = nuke.thisNode()
         name = readNode.name()
         currentFrame = readNode.knob('file').evaluate()
@@ -90,10 +94,9 @@ class NukeAutolabel(tank.platform.Application):
         colorspace = ""
         if not "DeepRead" in readNode.Class(): # DeepRead nodes have no colorspace knob
             colorspace = readNode.knob("colorspace").value()
-            colorspace = '(' + colorspace + ')'
+            colorspace = "({})".format(colorspace)
 
-
-        labelStart = name + '\n' + currentFrame
+        labelStart = "{}\n{}".format(name, currentFrame)
         imagePath = readNode.knob('file').toScript()
         imagePath = nuke.filenameFilter(imagePath)
 
@@ -101,26 +104,53 @@ class NukeAutolabel(tank.platform.Application):
         RenderLayer = ''
         Camera = ''
         AOV = ''
-        tk = self.sgtk
+
         tmpl = tk.template_from_path(imagePath)
         if tmpl:
             if tmpl.name in self.get_setting('render3d_templates'): # if the template corresponds to one from the list defined in the app settings
 
                 fields = tmpl.get_fields(imagePath)
 
-                if fields.get("RenderLayer"): RenderLayer = str(fields.get("RenderLayer"))
-                if fields.get("Camera"): Camera = str(fields.get("Camera"))
-                if fields.get("AOV"): AOV = str(fields.get("AOV"))
+                if fields.get("RenderLayer"):
+                    RenderLayer = str(fields.get("RenderLayer"))
+                if fields.get("Camera"):
+                    Camera = str(fields.get("Camera"))
+                if fields.get("AOV"):
+                    AOV = str(fields.get("AOV"))
 
                 if Camera == 'beauty' or AOV == 'beauty' or Camera == 'RGBA' or AOV == 'RGBA': 
                     readNode.knob('tile_color').setValue(self.beauty_tile_color)
                 else :
                     readNode.knob('tile_color').setValue(self.other3d_tile_color)
 
-
                 labelMiddle = ':'.join([x for x in [RenderLayer, Camera, AOV] if x != ''])
 
-                return labelStart + '\n' + labelMiddle + '\n' + colorspace
+
+            if tmpl.name in self.get_setting('hiero_templates'):
+
+                fields = tmpl.get_fields(imagePath)
+
+                hiero_type_field = self.get_setting('hiero_type_field')
+                hiero_type_colors = self.get_setting("hiero_type_colors")
+
+                if fields.get(hiero_type_field): # the field exists, set it in uppercase on the node label
+                    labelMiddle = fields.get(hiero_type_field).upper()
+
+                plate_context = tk.context_from_path(imagePath)
+                if context.entity and plate_context.entity and context.entity == plate_context.entity: # only apply to renders pertaining to the current context
+                    if fields.get(hiero_type_field) in hiero_type_colors:
+                        color = hiero_type_colors[fields.get(hiero_type_field)]
+                        color = self.tileColorConvert(color)
+                        readNode.knob('tile_color').setValue(color)
+                    else:
+                        color = self.get_setting("hiero_default_color")
+                        color = self.tileColorConvert(color)
+                        readNode.knob('tile_color').setValue(color)
+
+            full_label = "\n".join([ x for x in [labelStart, labelMiddle, colorspace, userlabel] if x != ''])
+            
+            return full_label
+
         else:
             return None                
 
